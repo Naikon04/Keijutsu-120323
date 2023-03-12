@@ -1,0 +1,261 @@
+#Kei Durak
+
+#imports needed for the game
+import random
+import sys
+from time import sleep
+import time
+import fontstyle
+from collections import Counter
+import pandas
+import csv
+
+#Headings for each rule set show up in a different style/ with appearing text to emphasise headings (and it looks kool)
+       
+#Adds font styles to heading text
+words = fontstyle.apply('General Rules\n\n', 'bold/Italics/underline/purple')
+   
+    #finds each individual letter in the inputted text, adds a small delay between each letter being typed
+for char in words:
+    sleep(0.025)
+    sys.stdout.write(char)
+    sys.stdout.flush()
+       
+time.sleep(1)
+
+print("•In Yassified Rock Paper Sissors")
+print(" both players are dealt cards from the same deck.")
+print("•In the deck there are 6 types each with cards labelled 1-9.")
+print("•Each player will have 6 cards at the start of each turn, playing one of them for each turn.\n")
+#Added this as a way to ensure the user has read rules without more appearing
+input("Press enter to continue\t")
+print("\n")
+
+words = fontstyle.apply('Gameplay Rules\n\n', 'bold/Italics/underline/purple')
+for char in words:
+    sleep(0.025)
+    sys.stdout.write(char)
+    sys.stdout.flush()
+   
+time.sleep(1)
+
+print("•Both players choose a card from their hand at the start of their turn.")
+print("•The score/strength of the chosen cards is represented by their number.")
+print("•Once the points have been acounted for, the strongest card wins the duel.")
+print("•The winner of the duel gets a point.")
+print("•If both players tie neither gets a point.")
+print("•The game ends after the set amount of rounds\n")
+input("Press enter to continue\t")
+print("\n")
+
+
+#silly add-in to check errors
+#print("Heloo tis I captain error checker")
+hand1 = []
+hand2 = []
+datagather = []
+wins1 = 0
+wins2 = 0
+currentround = 0
+
+
+
+
+#.01 creating the deck
+types = ["Fire", "Bug", "Grass", "Rock", "Ice", "Ground"]
+cards = []
+fulldeck = []
+trump = random.choice(types)
+
+#creates cards labelled 1-9 for each type
+
+for i in range (1,10):
+    cards.append(str(i))
+
+#connecting the prior made cards and putting them into each of the types
+
+for j in range (6):
+    for k in range (9):
+        deck = (cards[k] + " " +  types[j])
+        fulldeck.append(deck)
+        random.shuffle(fulldeck)
+        
+#.02 Adding cards to each players hand
+       
+#This takes the cards from the full deck, adds them to the players hands, and then removes them from the deck
+while len(hand1) < 6:
+    hand1.append(fulldeck.pop(0))
+
+while len(hand2) < 6:
+    hand2.append(fulldeck.pop(0))
+
+def Opening():
+    
+    global user1
+    global user2
+    global rounds
+    global version
+    version = input('''Do you wish to play this against a random bot ['Solo']
+pass and play against another player ['Versus']
+or have two Ai play against eachother to collect data['Simulation']\n\n''').lower()
+    
+    if version == 'sim':
+         user1 = ("Computer Steve")
+         user2 = ("Computer Alex")
+    elif version == 'versus':
+        user1 = input("Type the name of player 1:\t").lower()
+        user2 = input("Type the name of player 2:\t").lower()
+        print("\n")
+    elif version == 'solo':
+        user1 = input("Type the name of player 1:\t").lower()
+        print("\n")
+        user2 = ("Computer Steve")    
+    else:
+        Opening()
+        
+    rounds = int(input("How many rounds should your game last?\nIts reccomended that games with players have less rounds:\t"))
+    print("\n\n")
+
+Opening()
+
+
+#Whole gameplay sequence
+def gameplay():
+    global wins1
+    global wins2
+    global currentround
+    global datagather
+    
+    while rounds > currentround:
+        #Checking game version, if the version is solo or versus it allows player 1 to choose an input
+        if version != 'sim':
+            print("\n\n\n")
+            print(trump + " are the trump suit")
+            print(hand1)
+            print(user1 + " is choosing")
+            print("You " + str(wins1) + " have wins")
+            ui_question = input("Type the number that corrisponds to the card you want to use [1,2,3,4,5,6], or 'rules' to see the rules:\n").lower()
+            print("\n")
+            
+        #These allow the player to choose the card they want to use
+            if (ui_question == "1") or (ui_question == "2") or (ui_question == "3") or (ui_question == "4") or (ui_question == "5") or (ui_question == "6"):
+                ui_question = int(ui_question) - 1
+                card1 = hand1[ui_question]
+                hand1.remove(card1)
+                hand1.append(fulldeck.pop(0))
+                print(card1)
+                
+        #If it's not duo or solo the second "player" is replaced with a bot that randomly chooses cards.
+        elif version == 'sim':
+            ui_question = random.randint(1,6)
+            ui_question = int(ui_question) - 1
+            card1 = hand1[ui_question]
+            hand1.remove(card1)
+            hand1.append(fulldeck.pop(0))
+            print(card1)
+
+        #Since versus play is the only version where the second player is an actual person this isolates it and allows the player to choose a card
+        if version == 'versus':
+            
+            print("\n\n\n\n\n\n\n")
+            MrBreaksIntervention = input(user1 + " look away it's " + user2 + "'s turn")
+            print("\n\n\n\n\n\n\n")
+        
+        
+            print("\n\n\n")
+            print(trump + " are the trump suit")
+            print(hand2)
+            print(user2 + " is choosing")
+            print("You " + str(wins2) + "  have wins")
+            if version == 'versus':
+                ui_question2 = input("Type the number that corrisponds to the card you want to use [1,2,3,4,5,6], or 'rules' to see the rules:").lower()
+                print("\n")
+                
+                if (ui_question2 == "1") or (ui_question2 == "2") or (ui_question2 == "3") or (ui_question2 == "4") or (ui_question2 == "5") or (ui_question2 == "6"):
+                    ui_question2 = int(ui_question2) - 1
+                    card2 = hand2[ui_question2]
+                    hand2.remove(card2)
+                    hand2.append(fulldeck.pop(0))
+                    print(card2)
+        #else if it's not versus (solo or sim) the card is once again chosen randomly           
+        elif version != 'versus':
+            ui_question2 = random.randint(1,6)
+            ui_question2 = int(ui_question2) - 1
+            card2 = hand2[ui_question2]
+            hand2.remove(card2)
+            hand2.append(fulldeck.pop(0))
+            print(card2)
+            
+        #print(card1, card2)
+        
+        typecard1 = card1.split(' ')
+        strength1 = (typecard1[0])
+        element1 = (typecard1[1])
+        datagather += [element1]
+        
+        typecard2 = card2.split(' ')
+        strength2 = (typecard2[0])
+        element2 = (typecard2[1])
+        datagather += [element2]
+
+        if strength1 > strength2:
+            wins1 += 1
+            currentround += 1
+            print(user1 + " gets a point")
+            gameplay()
+            
+        elif strength2 > strength1:
+            wins2 += 2
+            currentround += 1
+            print(user2 + " gets a point")
+            gameplay()
+            
+        else:
+            print("You tied, neither get a point")
+            currentround += 1
+            gameplay()
+            
+    while currentround == rounds:
+        if wins1 > wins2:
+            print(user1 + " wins the overall game, yayyyyy")
+            print(datagather)
+            counts = Counter(datagather)
+            print(counts)
+            with open("YassifiedRockPaperSissors.csv", 'a', encoding='UTF8', newline='') as f:
+                # create the csv writer
+                writer = csv.writer(f)
+                # write a row to the csv file
+                BarryfromWestham = none
+                csvData=datagather, BarryfromWestham
+                writer.writerow(csvData)
+            exit()
+            
+        elif wins2 > wins1:
+            print(user2 + " wins the overall game, yayyyyy")
+            print(datagather)
+            counts = Counter(datagather)
+            print(counts)
+            with open("YassifiedRockPaperSissors.csv", 'a', encoding='UTF8', newline='') as f:
+                # create the csv writer
+                writer = csv.writer(f)
+                # write a row to the csv file
+                BarryfromWestham = none
+                csvData=datagather, BarryfromWestham
+                writer.writerow(csvData)
+            exit()
+            
+        else:
+            print("You tied  overall. Wee bit boring init?")
+            print(datagather)
+            counts = Counter(datagather)
+            print(counts)
+            with open("YassifiedRockPaperSissors.csv", 'a', encoding='UTF8', newline='') as f:
+                # create the csv writer
+                writer = csv.writer(f)
+                # write a row to the csv file
+                BarryfromWestham = none
+                csvData=datagather, BarryfromWestham
+                writer.writerow(csvData)
+            exit()
+            
+gameplay()
